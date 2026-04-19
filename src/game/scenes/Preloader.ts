@@ -32,6 +32,11 @@ export class Preloader extends Scene {
 
         this.load.image('background', 'background.png');
 
+        this.load.image('unmute', 'audio/unmute.png')
+        this.load.image('mute', 'audio/mute.png')
+        this.load.image('sound_unmute', 'audio/sound_unmute.png')
+        this.load.image('sound_mute', 'audio/sound_mute.png')
+
         this.load.atlas('planet-sheet-s', 'planet/planet-sheet-s.png', 'planet/planet-sheet-s.json')
         this.load.atlas('planet-sheet-m', 'planet/planet-sheet-m.png', 'planet/planet-sheet-m.json')
         this.load.atlas('planet-sheet-l', 'planet/planet-sheet-l.png', 'planet/planet-sheet-l.json')
@@ -41,7 +46,19 @@ export class Preloader extends Scene {
         this.load.aseprite('outline-m', 'outline/outline-m.png', 'outline/outline-m.json')
         this.load.aseprite('outline-l', 'outline/outline-l.png', 'outline/outline-l.json')
 
-        this.load.image('signal', 'signal2.png')
+        this.load.aseprite('signal', 'signal.png', 'signal.json')
+
+        // this.load.image('signal', 'signal2.png')
+
+        this.load.image('tut1', 'tutorial/tut1.png')
+        this.load.image('tut2', 'tutorial/tut2.png')
+        this.load.image('tut3', 'tutorial/tut3.png')
+
+        this.load.audio('theme', 'audio/Theme2.wav')
+        this.load.audio('signal', 'audio/signal.wav')
+        this.load.audio('gameover', 'audio/gameover.wav')
+        this.load.audio('success', 'audio/success.wav')
+
     }
 
     create() {
@@ -58,7 +75,13 @@ export class Preloader extends Scene {
             'outline-l',
         )
 
+        this.anims.createFromAseprite(
+            'signal',
+        )
+
         //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
+        this.scene.start('AudioManager');
+        this.scene.start('UI');
         this.scene.start('MainMenu');
     }
 }

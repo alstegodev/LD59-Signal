@@ -4,6 +4,9 @@ import { Game as MainGame } from './scenes/Game';
 import { MainMenu } from './scenes/MainMenu';
 import {WEBGL, Game, Scale} from 'phaser';
 import { Preloader } from './scenes/Preloader';
+import {AudioManager} from "./scenes/AudioManager.ts";
+import {UI} from "./scenes/UI.ts";
+import {Tutorial} from "./scenes/Tutorial.ts";
 
 //  Find out more information about the Game Config at:
 //  https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
@@ -36,7 +39,10 @@ const config: Phaser.Types.Core.GameConfig = {
         Preloader,
         MainMenu,
         MainGame,
-        GameOver
+        GameOver,
+        AudioManager,
+        UI,
+        Tutorial
     ]
 };
 

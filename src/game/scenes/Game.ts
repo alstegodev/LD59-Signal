@@ -1,5 +1,5 @@
 import {Math, Scene} from 'phaser';
-import {levels} from "../classes/levels.ts";
+import {generateLevel, levels} from "../classes/levels.ts";
 import Sprite = Phaser.GameObjects.Sprite;
 
 export class Game extends Scene {
@@ -18,12 +18,17 @@ export class Game extends Scene {
 
     signals: number = 0;
 
+    level_planet_count: number = 10
+    level_signal_speed: number = 12
+
+    score_level = 0;
+
 
     constructor() {
         super('Game');
     }
 
-    create(data: { currentLevel: number }) {
+    create(data: { currentLevel: number, planetCount: number, signalSpeed: number }) {
         this.camera = this.cameras.main;
         this.camera.setBackgroundColor(0x000000);
 
@@ -32,6 +37,10 @@ export class Game extends Scene {
         background.setDisplaySize(640, 360);
 
         this.currentlevel = data.currentLevel;
+        this.level_planet_count = data.planetCount;
+        this.level_signal_speed = data.signalSpeed;
+
+        this.score_level = 0
 
         this.loadLevel(data.currentLevel);
     }
@@ -48,8 +57,6 @@ export class Game extends Scene {
 
 
         this.signals = 0;
-
-        console.log(levels[this.currentlevel].planets)
 
         this.planets = levels[this.currentlevel].planets.map(planet => {
             let sprite: Sprite
@@ -119,7 +126,14 @@ export class Game extends Scene {
         let originPlanet = currentLevelConf.planets[planet];
 
         originPlanet.connections.forEach(connection => {
-            let signal = this.add.sprite(originPlanet.x, originPlanet.y, 'signal')
+
+            this.game.events.emit('signal')
+
+            let signal = this.add.sprite(originPlanet.x, originPlanet.y, 'signal').play({
+                key: 'Blink',
+                timeScale: 0.5,
+                repeat: -1,
+            })
             signal.setRotation(Math.Angle.BetweenPoints(originPlanet, currentLevelConf.planets[connection]));
 
             this.signals++
@@ -144,6 +158,12 @@ export class Game extends Scene {
     }
 
     finishPlanet(planet: number) {
+
+        if(this.planets[planet].finished) return
+
+        this.game.events.emit('score_up')
+        this.score_level++
+
         let planetSprite = this.planets[planet].sprite;
         let planetOutline = this.planets[planet].outline;
         planetSprite.removeAllListeners()
@@ -156,6 +176,9 @@ export class Game extends Scene {
             this.planets[planet].active = true;
             this.planets[planet].finished = false;
             planetOutline.clearTint();
+
+            this.game.events.emit('score_down')
+            this.score_level--
 
             planetSprite.on('pointerover', () => {
                 this.planets[planet].active = true;
@@ -178,6 +201,8 @@ export class Game extends Scene {
             }
         });
         if (finished) {
+            this.game.events.emit('success')
+
             this.unloadCurrentSprites();
             this.loadNextLevel();
         } else {
@@ -185,6 +210,9 @@ export class Game extends Scene {
                 this.msg_text.setText('Game Over');
                 this.children.bringToTop(this.msg_text);
                 this.msg_text.setAlpha(1)
+
+                this.highlightNotConnectedPlanets()
+                this.game.events.emit('gameover', {score_level: this.score_level})
 
                 let againText = this.add.text(320, 260, 'Try Again?', {
                     fontFamily: 'Arial Black', fontSize: 16, color: '#ffffff',
@@ -203,6 +231,17 @@ export class Game extends Scene {
         }
     }
 
+    highlightNotConnectedPlanets() {
+        this.planets.forEach(planet => {
+            if (!planet.finished) {
+                planet.sprite.setTint(0xff0000);
+                planet.outline.setTint(0xff0000);
+                planet.outline.setAlpha(1);
+            }
+
+        })
+    }
+
     unloadCurrentSprites() {
         this.planets.forEach(planet => {
             planet.sprite.destroy();
@@ -214,16 +253,55 @@ export class Game extends Scene {
     }
 
     restartCurrentLevel() {
-        this.scene.start('Game', {currentLevel: this.currentlevel});
+        this.scene.start('Game', {currentLevel: this.currentlevel, planetCount: this.level_planet_count, signalSpeed: this.level_signal_speed});
     }
 
     loadNextLevel() {
 
         if (this.currentlevel < levels.length - 1) {
             this.currentlevel++;
-            this.scene.start('Game', {currentLevel: this.currentlevel});
+            this.scene.start('Game', {currentLevel: this.currentlevel, planetCount: 10, signalSpeed: 12});
         } else {
-            this.scene.start('GameOver');
+
+            this.level_planet_count += 2;
+            switch (this.level_planet_count) {
+                case 10:
+                    this.level_signal_speed = 12;
+                    break;
+                case 16:
+                    this.level_signal_speed = 11;
+                    break;
+                case 22:
+                    this.level_signal_speed = 10;
+                    break;
+                case 28:
+                    this.level_signal_speed = 9;
+                    break;
+                case 34:
+                    this.level_signal_speed = 8;
+                    break;
+                case 40:
+                    this.level_signal_speed = 7;
+                    break;
+                case 46:
+                    this.level_signal_speed = 6;
+                    break;
+                case 52:
+                    this.level_signal_speed = 5;
+                    break;
+                case 58:
+                    this.level_signal_speed = 4;
+                    break;
+            }
+
+            levels.push(generateLevel(this.level_planet_count, this.level_signal_speed, 640, 360))
+            this.currentlevel++;
+            this.scene.start('Game', {
+                currentLevel: this.currentlevel,
+                planetCount: this.level_planet_count,
+                signalSpeed: this.level_signal_speed
+            });
+            // this.scene.start('GameOver');
         }
     }
 }

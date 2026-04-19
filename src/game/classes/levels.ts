@@ -17,20 +17,20 @@ export const levels: Level[] = [
     {
         planets: [
             {x: 150, y: 250, connections: [1], sprite: 2, size: 'l'},
-            {x: 230, y: 70, connections: [2], sprite: 1, size: 'm'},
-            {x: 420, y: 250, connections: [3], sprite: 2, size: 's'},
-            {x: 500, y: 60, connections: [0], sprite: 3, size: 'm'}
+            {x: 230, y: 70, connections: [2, 0], sprite: 1, size: 'm'},
+            {x: 420, y: 250, connections: [3, 1], sprite: 2, size: 's'},
+            {x: 500, y: 60, connections: [], sprite: 3, size: 'm'}
         ],
-        signalSpeed: 20
+        signalSpeed: 10
     },
     {
         planets: [
             {x: 100, y: 75, connections: [1], sprite: 0, size: 'm'},
-            {x: 190, y: 130, connections: [2, 4], sprite: 1, size: 'l'},
-            {x: 200, y: 220, connections: [3], sprite: 2, size: 'm'},
-            {x: 90, y: 280, connections: [], sprite: 3, size: 's'},
-            {x: 440, y: 120, connections: [5], sprite: 3, size: 'm'},
-            {x: 540, y: 180, connections: [6], sprite: 1, size: 's'},
+            {x: 190, y: 130, connections: [0, 2, 4], sprite: 1, size: 'l'},
+            {x: 200, y: 220, connections: [1, 3], sprite: 2, size: 'm'},
+            {x: 90, y: 280, connections: [0], sprite: 3, size: 's'},
+            {x: 440, y: 120, connections: [1, 5], sprite: 3, size: 'm'},
+            {x: 540, y: 180, connections: [4, 6], sprite: 1, size: 's'},
             {x: 450, y: 280, connections: [], sprite: 2, size: 'l'},
         ],
         signalSpeed: 10
@@ -38,10 +38,10 @@ export const levels: Level[] = [
     {
         planets: [
             {x: 320, y: 180, connections: [1, 5, 9], sprite: 0, size: 'l'},
-            {x: 420, y: 180, connections: [2], sprite: 1, size: 'm'},
-            {x: 500, y: 320, connections: [3], sprite: 1, size: 's'},
-            {x: 580, y: 80, connections: [4], sprite: 3, size: 's'},
-            {x: 360, y: 60, connections: [5], sprite: 2, size: 'l'},
+            {x: 420, y: 180, connections: [0, 2], sprite: 1, size: 'm'},
+            {x: 500, y: 320, connections: [1, 3], sprite: 1, size: 's'},
+            {x: 580, y: 80, connections: [2, 4], sprite: 3, size: 's'},
+            {x: 360, y: 60, connections: [3, 5], sprite: 2, size: 'l'},
 
             {x: 220, y: 70, connections: [6], sprite: 1, size: 'l'},
             {x: 120, y: 110, connections: [7, 5], sprite: 2, size: 's'},
@@ -49,25 +49,7 @@ export const levels: Level[] = [
             {x: 115, y: 220, connections: [7, 9], sprite: 0, size: 'm'},
             {x: 210, y: 310, connections: [8], sprite: 3, size: 'l'},
         ],
-        signalSpeed: 20
-    },
-    {
-        planets: [
-            {x: 70, y: 60, connections: [1, 3], sprite: 0, size: 'm'},
-            {x: 100, y: 175, connections: [0, 4, 2], sprite: 1, size: 'l'},
-            {x: 160, y: 300, connections: [1, 5], sprite: 2, size: 's'},
-            {x: 195, y: 75, connections: [0, 4, 6], sprite: 3, size: 'm'},
-            {x: 240, y: 190, connections: [1, 3, 7], sprite: 0, size: 'l'},
-
-            {x: 320, y: 290, connections: [2, 7, 8], sprite: 1, size: 's'},
-            {x: 335, y: 75, connections: [3, 7, 9], sprite: 2, size: 'm'},
-            {x: 400, y: 190, connections: [4, 5, 6, 10], sprite: 3, size: 'l'},
-            {x: 490, y: 290, connections: [5, 10], sprite: 0, size: 's'},
-            {x: 480, y: 60, connections: [6, 10], sprite: 1, size: 'm'},
-
-            {x: 560, y: 190, connections: [7, 8, 9], sprite: 2, size: 'l'},
-        ],
-        signalSpeed: 20
+        signalSpeed: 12
     },
     {
         planets: [
@@ -97,14 +79,9 @@ export const levels: Level[] = [
         ],
         signalSpeed: 10
     },
-    generateLevel(10, 10, 640, 360),
-    generateLevel(20, 10, 640, 360),
-    generateLevel(20, 8, 640, 360),
-    generateLevel(30, 8, 640, 360),
-    generateLevel(40, 8, 640, 360),
 ]
 
-function generateLevel(planetCount: number, signalSpeed: number, width: number, height: number): Level {
+export function generateLevel(planetCount: number, signalSpeed: number, width: number, height: number): Level {
 
     const planets: Planet[] = []
 
@@ -112,10 +89,9 @@ function generateLevel(planetCount: number, signalSpeed: number, width: number, 
         const size = getPlanetSize();
         const radius = radiusForSize(size);
 
-        let placed = false;
         for (let tries = 0; tries < 200; tries++) {
-            const x = (radius + 5) + (Math.random() * (width -  2*radius - 10));
-            const y = (radius + 5) + (Math.random() * (height - 2*radius - 10));
+            const x = (radius + 5) + (Math.random() * (width - 2 * radius - 10));
+            const y = (radius + 5) + (Math.random() * (height - 2 * radius - 10));
 
             if (isValidPosition(x, y, radius, planets)) {
                 planets.push({
@@ -123,20 +99,15 @@ function generateLevel(planetCount: number, signalSpeed: number, width: number, 
                     connections: [],
                     sprite: randomSprite()
                 });
-                placed = true;
                 break;
             }
         }
-        //
-        // if (!placed) {
-        //     i--;
-        // }
     }
 
     const maxDist = 300;
     for (let i = 0; i < planets.length; i++) {
         const neighbors = planets
-            .map((p, j) => ({ index: j, dist: distance(planets[i], p)}))
+            .map((p, j) => ({index: j, dist: distance(planets[i], p)}))
             .filter(n => n.index !== i && n.dist <= maxDist)
             .sort((a, b) => a.dist - b.dist);
 
@@ -147,7 +118,7 @@ function generateLevel(planetCount: number, signalSpeed: number, width: number, 
         }
     }
 
-    ensureConnected(planets, maxDist);
+    ensureConnected(planets);
 
     return {
         planets,
@@ -179,7 +150,7 @@ function radiusForSize(size: PlanetSize): number {
 
 function isValidPosition(x: number, y: number, radius: number, planets: Planet[]): boolean {
     for (const planet of planets) {
-        const distancePlanet = distance(planet, { x, y });
+        const distancePlanet = distance(planet, {x, y});
         if (distancePlanet < radius + radiusForSize(planet.size)) {
             return false;
         }
@@ -206,9 +177,6 @@ function addConnection(planets: Planet[], i: number, j: number) {
 }
 
 function ensureConnected(planets: Planet[]) {
-    let connected = false;
-    console.log(planets);
-
     let visited = new Set<number>();
     const queue: number[] = [];
     queue.push(0);
@@ -221,23 +189,17 @@ function ensureConnected(planets: Planet[]) {
         queue.push(...neighbors);
     }
 
-    console.log(visited);
+    if (visited.size == planets.length) {
 
-    if(visited.size == planets.length) {
-        connected = true;
     } else {
-        console.log('NOT CONNECTED');
         let notConnected = planets.findIndex((_, i) => !visited.has(i));
-        console.log(notConnected);
 
         let visitedPlanets: { distance: number, index: number }[] = []
-        visited.forEach(( i) => {
+        visited.forEach((i) => {
             visitedPlanets.push({distance: distance(planets[notConnected], planets[i]), index: i})
         })
-        console.log(visitedPlanets);
 
         let bestConnectionm = visitedPlanets.sort((a, b) => a.distance - b.distance).filter(d => d.distance != 0)[0];
-        console.log(bestConnectionm);
 
         addConnection(planets, notConnected, bestConnectionm.index);
         ensureConnected(planets);

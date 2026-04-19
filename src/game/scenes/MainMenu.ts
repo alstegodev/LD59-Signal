@@ -19,9 +19,9 @@ export class MainMenu extends Scene
         this.logo = this.add.image(320, 140, 'logo');
         this.logo.setScale(2)
 
-        this.title = this.add.text(320, 240, 'Press to Continue', {
-            fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
-            stroke: '#000000', strokeThickness: 8,
+        this.title = this.add.text(320, 240, 'Press to Start', {
+            fontFamily: 'Arial Black', fontSize: 24, color: '#f3f3f3',
+            stroke: '#000000', strokeThickness: 6,
             align: 'center'
         }).setOrigin(0.5);
 
@@ -39,7 +39,7 @@ export class MainMenu extends Scene
 
         this.input.once('pointerdown', () => {
 
-            this.scene.start('Game', {currentLevel: 0});
+            this.scene.start('Tutorial')
 
         });
     }
